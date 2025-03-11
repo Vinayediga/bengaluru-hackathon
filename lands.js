@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, doc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, onSnapshot, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -51,7 +51,7 @@ async function FetchLandDetails() {
             cardButton.addEventListener('click', () => {
                 localStorage.setItem(lands.title,JSON.stringify(landId))
                 showPopup(lands, landId);
-                onsnapshot_create_BId_container(lands,landId)
+                onsnapshot_create_BId_container(landId)
             });
       
             
@@ -114,10 +114,14 @@ function showPopup(lands, landID) {
     const popupStatus = document.getElementById("popup-status");
     const popupBoundary = document.getElementById("popup-boundary");
     const popupTransaction = document.getElementById("popup-transaction");
-    const popupBody = document.querySelector(".popup-body"); // Corrected selector
+    const bidContainer = document.getElementById("bid-container");
     const bidBtn = document.getElementById("btn");
+    const bidAmount = document.getElementById("bid-amount");
+    const closeButton = document.getElementById("close-button");
+
     if (bidBtn) {
         bidBtn.dataset.id = landID; // Ensure the landID is set correctly
+        bidBtn.addEventListener('click', () => handleBidButtonClick(lands, landID));
     } else {
         console.error("Bid button not found");
     }
@@ -134,61 +138,39 @@ function showPopup(lands, landID) {
     popup.style.display = "block";
     overlay.style.display = "block";
     localStorage.setItem("doc_id", JSON.stringify(landID)); // Store land ID in localStorage
+
+    // Always show the bid container with the dropdown
+    bidContainer.style.display = "flex";
+
+    // Add event listener to close button
+    closeButton.addEventListener('click', () => {
+        popup.style.display = "none";
+        overlay.style.display = "none";
+    });
 }
 
-// Function to create and add the start bid button dynamically
-function addStartBidButton() {
+async function handleBidButtonClick(lands, landID) {
+    const landDocRef = doc(firestore, "lands", landID);
+    const bidsCollectionRef = collection(landDocRef, "bids");
 
-}
+    // Check if the bids collection already exists
+    const bidsQuery = query(bidsCollectionRef);
+    const querySnapshot = await getDocs(bidsQuery);
 
-// Call the function to add the start bid button when the popup is shown
-document.getElementById('popup').addEventListener('show', addStartBidButton);
-
-document.getElementById("close-button").addEventListener("click", () => {
-    document.getElementById("popup").style.display = "none";
-    document.getElementById("overlay").style.display = "none";
-});
-
-async function showStartBid() {
-    const land_ID = JSON.parse(localStorage.getItem("doc_id"));
-    if (!land_ID) {
-        console.error("No land ID found in localStorage");
-        return;
-    }
-    const landDoc = await getDoc(doc(firestore, "lands", land_ID));
-    if (!landDoc.exists()) {
-        console.error("Land document does not exist");
-        return;
-    }
-    const landData = landDoc.data();
-    const bid_id = `${landData.title}${landData.Address}`;
-    const bidDoc = await getDoc(doc(firestore, "Bids", bid_id));
-    const bidBtn = document.getElementById("btn");
-    if (bidBtn) {
-        if (bidDoc.exists()) {
-            bidBtn.style.display = "none";
-            createBidContainer(bid_id);
-        } else {
-            bidBtn.style.display = "block";
-        }
+    if (querySnapshot.empty) {
+        // Create the bids collection if it doesn't exist
+        await addDoc(bidsCollectionRef, {
+            name: "vinay kumar",
+            bid: 0 // Initial bid value
+        });
+        console.log("Bids collection created");
     } else {
-        console.error("Bid button not found");
+        // Fetch and display the bids if the collection already exists
+        onsnapshot_create_BId_container(landID);
     }
 }
 
-async function createBidContainer(id) {
-    const bidContainer = document.getElementById("bid-container");
-    const landDoc = await getDoc(doc(firestore, "bids", id));
-    if (landDoc.exists()) {
-        const land = landDoc.data();
-        const unique_id = `${land.id}${land.Address}`;
-        // ...additional code to handle bid container...
-    } else {
-        console.log("landDoc doesn't exist | wrong ID");
-    }
-}
-
-async function onsnapshot_create_BId_container(lands, land_ID) {
+async function onsnapshot_create_BId_container(land_ID) {
     const bidContainer = document.getElementById("bid-container");
     const bid_track_container = document.querySelector(".bid-track-container");
     const currentprice = document.querySelector(".price-container");
@@ -197,12 +179,19 @@ async function onsnapshot_create_BId_container(lands, land_ID) {
         return;
     }
 
+    // Clear existing bid data
+    bid_track_container.innerHTML = "";
+    currentprice.innerHTML = "";
+
     const userAmtContainer = document.createElement("div");
     userAmtContainer.className = "user-amt-container";
     const btn = document.getElementById("btn");
     const bidAmount = document.getElementById("bid-amount");
-    const collect_id = `${land_ID}${lands.Address}`;
-    onSnapshot(collection(db, collect_id), (snapshot) => {
+    const landDocRef = doc(firestore, "lands", land_ID);
+    const bidsCollectionRef = collection(landDocRef, "bids");
+
+    onSnapshot(bidsCollectionRef, (snapshot) => {
+        let totalAmount = 0; // Initialize totalAmount here
         snapshot.docChanges().forEach((change) => {
             if (change.type === "added") {
                 const bid_details = change.doc.data();
@@ -221,15 +210,11 @@ async function onsnapshot_create_BId_container(lands, land_ID) {
                 userAmtContainer.appendChild(bid_amt_elem);
                 bid_track_container.appendChild(userAmtContainer);
 
-                let totalAmount = 0;
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    totalAmount += data.bid; // Summing up the amount field
-                });
-
-                currentprice.textContent = totalAmount;
+                totalAmount += Number(bid); // Sum the bid amounts as numbers
             }
         });
+
+        currentprice.textContent = totalAmount; // Display the total amount
     });
 }
 
@@ -240,13 +225,43 @@ async function set_bid_doc(amount) {
 
     const landDoc = await getDoc(doc(firestore, "lands", land_id));
     const land = landDoc.data();
-    const land_address = land.Address;
-    const collect_id = `${land_id}${land_address}`;
+    const landDocRef = doc(firestore, "lands", land_id);
+    const bidsCollectionRef = collection(landDocRef, "bids");
 
-    await addDoc(collection(firestore, collect_id), {
+    await addDoc(bidsCollectionRef, {
         name: "vinay kumar",
-        bid: amount
+        bid: Number(amount) // Ensure the bid amount is stored as a number
     });
+
+    // Fetch and display the updated bids
+    onsnapshot_create_BId_container(land_id);
+}
+
+async function showStartBid() {
+    const land_ID = JSON.parse(localStorage.getItem("doc_id"));
+    if (!land_ID) {
+        console.error("No land ID found in localStorage");
+        return;
+    }
+    const landDoc = await getDoc(doc(firestore, "lands", land_ID));
+    if (!landDoc.exists()) {
+        console.error("Land document does not exist");
+        return;
+    }
+    const landData = landDoc.data();
+    const bid_id = `${landData.title}${landData.Address}`;
+    const bidDoc = await getDoc(doc(firestore, "lands", land_ID, "bids", bid_id));
+    const bidBtn = document.getElementById("btn");
+    if (bidBtn) {
+        if (bidDoc.exists()) {
+            bidBtn.style.display = "none";
+            createBidContainer(bid_id);
+        } else {
+            bidBtn.style.display = "block";
+        }
+    } else {
+        console.error("Bid button not found");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
