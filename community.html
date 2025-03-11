@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for the navbar and button */
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            color: #ff6f61;
+            font-weight: bold;
+        }
+        .navbar .profile {
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .navbar .profile .name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .fetch-users-btn {
+            margin-top: 60px; /* To ensure the button is below the navbar */
+            margin-left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #ff6f61;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            z-index: 999;
+        }
+        .user-list {
+            margin-top: 100px; /* To ensure the user list is below the navbar */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .user-card {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            color: #fff;
+            width: 200px;
+        }
+        .user-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: black;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            z-index: 1001;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #ff6f61;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #fff;
+        }
+        .open-sidebar-btn {
+            font-size: 30px;
+            cursor: pointer;
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            z-index: 1002;
+            color: #ff6f61;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">MyApp</div>
+        <div class="profile">
+            <img src="profile.jpg" alt="User Profile">
+            <div class="name">John Doe</div>
+        </div>
+    </div>
+    <span class="open-sidebar-btn" onclick="openSidebar()">&#9776;</span>
+    <div class="sidebar" id="mySidebar">
+        <a href="javascript:void(0)" onclick="closeSidebar()">Close &times;</a>
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+    </div>
+    <button class="fetch-users-btn" id="fetchUsersBtn">Fetch Users</button>
+    <div class="user-list" id="userList"></div>
+
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2ycXtES3tqzyK4nVMmKoXsniYAcqyBd8",
+            authDomain: "my-project-635e4.firebaseapp.com",
+            projectId: "my-project-635e4",
+            storageBucket: "my-project-635e4.appspot.com",
+            messagingSenderId: "423533185631",
+            appId: "1:423533185631:web:23a88a1302e9517042e9ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+
+        // Fetch users and render them
+       /* document.getElementById('fetchUsersBtn').addEventListener('click', async () => {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = ''; // Clear previous user list
+
+            try {
+                const querySnapshot = await getDocs(collection(firestore, 'users'));
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    console.log(user);
+                    
+                    const userCard = document.createElement('div');
+                    userCard.classList.add('user-card');
+                    userCard.innerHTML = `
+                        <img src="${user.profileImage}" alt="${user.name}">
+                        <div class="name">${user.name}</div>
+                    `;
+                    userList.appendChild(userCard);
+                });
+            } catch (error) {
+                console.error("Error fetching users: ", error);
+            }
+        });*/
+
+        // Sidebar functions
+        function openSidebar() {
+            document.getElementById("mySidebar").style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.width = "0";
+        }
+    </script>
+</body>
+</html>

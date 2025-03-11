@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,4 +83,90 @@
         user.innerText = username
     </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for the navbar */
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            color: #ff6f61;
+            font-weight: bold;
+        }
+        .navbar .profile {
+            display: flex;
+            align-items: center;
+            color: black;
+        }
+        .navbar .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .navbar .profile .name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .nav-elem {
+            margin: 0 10px;
+            color: #333;
+            cursor: pointer;
+        }
+        a{
+            text-decoration: none;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">MyApp</div>
+        <div class="nav-elem" id="community"><a href="communitys.html" >community</a></div>
+        <div class="nav-elem"><a href="home.html" >home</a></div>
+        <div class="nav-elem"><a href="community.html" >services </a></div>
+        <div class="nav-elem"><a href="community.html" >carrer</a></div>
+        <div class="profile">
+            <img src="profile.jpg" alt="User Profile">
+            <div class="name" id="name">John Doe</div>
+        </div>
+    </div>
+    <script>
+        const user = document.getElementById('name')
+        const username = localStorage.getItem('user-name')
+        user.innerText = username
+    </script>
+</body>
+>>>>>>> 8900ebe (adding new feature)
 </html>
