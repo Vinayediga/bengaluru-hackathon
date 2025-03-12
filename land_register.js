@@ -21,6 +21,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     const name = document.getElementById('name').value;
     const address = document.getElementById('address').value;
     const imageInput = document.getElementById('imageInput').files[0];
+    const endDate = document.getElementById('end-date').value;
+    const endDateISO = new Date(endDate).toISOString();
 
     if (!name || !address || !imageInput) {
         alert('Please fill all fields and choose an image.');
@@ -38,7 +40,8 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             await addDoc(collection(firestore, 'lands'), {
                 title: name,
                 Address: address,
-                imageUrl: base64String
+                imageUrl: base64String,
+                endTime: endDateISO // Add the ISO formatted end date
             });
 
             alert('Land details uploaded successfully!');

@@ -139,8 +139,8 @@ function showPopup(lands, landID) {
     overlay.style.display = "block";
     localStorage.setItem("doc_id", JSON.stringify(landID)); // Store land ID in localStorage
 
-    // Always show the bid container with the dropdown
-    bidContainer.style.display = "flex";
+    // Hide the bid container initially
+    bidContainer.style.display = "none";
 
     // Add event listener to close button
     closeButton.addEventListener('click', () => {
@@ -183,10 +183,6 @@ async function onsnapshot_create_BId_container(land_ID) {
     bid_track_container.innerHTML = "";
     currentprice.innerHTML = "";
 
-    const userAmtContainer = document.createElement("div");
-    userAmtContainer.className = "user-amt-container";
-    const btn = document.getElementById("btn");
-    const bidAmount = document.getElementById("bid-amount");
     const landDocRef = doc(firestore, "lands", land_ID);
     const bidsCollectionRef = collection(landDocRef, "bids");
 
@@ -197,6 +193,9 @@ async function onsnapshot_create_BId_container(land_ID) {
                 const bid_details = change.doc.data();
                 const User_name = bid_details.name;
                 const bid = bid_details.bid;
+
+                const userAmtContainer = document.createElement("div");
+                userAmtContainer.className = "user-amt-container";
 
                 const username_elem = document.createElement("div");
                 username_elem.id = "username";
@@ -215,6 +214,9 @@ async function onsnapshot_create_BId_container(land_ID) {
         });
 
         currentprice.textContent = totalAmount; // Display the total amount
+
+        // Show the bid container after data is fetched
+        bidContainer.style.display = "flex";
     });
 }
 
